@@ -30,11 +30,18 @@ public final class Animators {
   private Animators() {}
 
   private interface AnimatorsImpl {
+    Animator playTogether(Animator... animators);
     Animator circularReveal(
         View view, int centerX, int centerY, float startRadius, float endRadius);
   }
 
   private static class BaseAnimatorsImpl implements AnimatorsImpl {
+
+    @Override
+    public Animator playTogether(Animator... animators) {
+      return AnimatorsBase.playTogether(animators);
+    }
+
     @Override
     public Animator circularReveal(
         View view, int centerX, int centerY, float startRadius, float endRadius) {
@@ -62,8 +69,18 @@ public final class Animators {
   }
 
   /**
-   * Creates circular reveal animation.
-   * <p>
+   * Creates an Animator to play all of the supplied animations at the same time.
+   * Returns {@code null} if there is no valid animator.
+   * Returns the first valid animator if there is only one valid animator.
+   * Returns an AnimatorSet if there are more the one animators.
+   */
+  @Nullable
+  public static Animator playTogether(Animator... animators) {
+    return IMPL.playTogether(animators);
+  }
+
+  /**
+   * Creates a circular reveal animator.
    * Returns {@code null} if can't create it or no need to create it.
    */
   @Nullable

@@ -22,6 +22,7 @@ package com.hippo.android.animator;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.view.View;
 import com.hippo.android.animator.reveal.Revealable;
@@ -29,6 +30,34 @@ import com.hippo.android.animator.util.FloatProperty;
 
 final class AnimatorsBase {
   private AnimatorsBase() {}
+
+  static Animator playTogether(Animator... animators) {
+    if (animators == null || animators.length == 0) {
+      return null;
+    }
+
+    Animator first = null;
+    AnimatorSet set = null;
+    AnimatorSet.Builder builder = null;
+    for (Animator animator : animators) {
+      if (animator == null) {
+        continue;
+      }
+      if (first == null) {
+        // Save first non-null animator
+        first = animator;
+      } else {
+        if (builder == null) {
+          // Get second non-null animator
+          // It's time to create a AnimatorSet
+          set = new AnimatorSet();
+          builder = set.play(first);
+        }
+        builder.with(animator);
+      }
+    }
+    return set == null ? first : set;
+  }
 
   private static class RevealProperty extends FloatProperty<Revealable> {
 
