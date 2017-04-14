@@ -28,6 +28,7 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -63,6 +64,39 @@ public class AnimatorsTest {
     assertEquals(animator, Animators.playTogether(Arrays.asList(new Animator[]{null, animator, null})));
 
     assertNotNull(Animators.playTogether(Arrays.asList(new Animator[]{
+        null,
+        ValueAnimator.ofInt(0, 0),
+        ValueAnimator.ofInt(0, 0),
+        null
+    })));
+  }
+
+  @Test
+  public void testPlaySequentiallyArray() {
+    assertNull(Animators.playSequentially());
+    assertNull(Animators.playSequentially((Animator[]) null));
+    assertNull(Animators.playSequentially(null, null, null));
+
+    Animator animator = new ValueAnimator();
+    assertEquals(animator, Animators.playSequentially(null, animator, null));
+
+    assertNotNull(Animators.playSequentially(
+        null,
+        ValueAnimator.ofInt(0, 0),
+        ValueAnimator.ofInt(0, 0),
+        null
+    ));
+  }
+
+  @Test
+  public void testPlaySequentiallyList() {
+    assertNull(Animators.playSequentially((List<Animator>) null));
+    assertNull(Animators.playSequentially(Arrays.asList(new Animator[]{null, null, null})));
+
+    Animator animator = new ValueAnimator();
+    assertEquals(animator, Animators.playSequentially(Arrays.asList(new Animator[]{null, animator, null})));
+
+    assertNotNull(Animators.playSequentially(Arrays.asList(new Animator[]{
         null,
         ValueAnimator.ofInt(0, 0),
         ValueAnimator.ofInt(0, 0),

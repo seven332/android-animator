@@ -29,6 +29,7 @@ import com.hippo.android.animator.reveal.Revealable;
 import com.hippo.android.animator.util.FloatProperty;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 final class AnimatorsBase {
   private AnimatorsBase() {}
@@ -67,6 +68,40 @@ final class AnimatorsBase {
       }
     }
     return set == null ? first : set;
+  }
+
+  static Animator playSequentially(Animator... animators) {
+    if (animators == null || animators.length == 0) {
+      return null;
+    } else {
+      return playSequentially(Arrays.asList(animators));
+    }
+  }
+
+  static Animator playSequentially(List<Animator> animators) {
+    if (animators == null || animators.size() == 0) {
+      return null;
+    }
+
+    AnimatorSet set = null;
+    Animator previous = null;
+    for (Animator animator : animators) {
+      if (animator == null) {
+        continue;
+      }
+      if (previous == null) {
+        // Save first non-null animator as previous
+        previous = animator;
+      } else {
+        if (set == null) {
+          set = new AnimatorSet();
+        }
+        set.play(previous).before(animator);
+        // Update previous
+        previous = animator;
+      }
+    }
+    return set == null ? previous : set;
   }
 
   private static class RevealProperty extends FloatProperty<Revealable> {

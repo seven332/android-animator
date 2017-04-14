@@ -26,6 +26,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.view.View;
 import java.util.Collection;
+import java.util.List;
 
 public final class Animators {
   private Animators() {}
@@ -33,6 +34,8 @@ public final class Animators {
   private interface AnimatorsImpl {
     Animator playTogether(Animator... animators);
     Animator playTogether(Collection<Animator> animators);
+    Animator playSequentially(Animator... animators);
+    Animator playSequentially(List<Animator> animators);
     Animator circularReveal(
         View view, int centerX, int centerY, float startRadius, float endRadius);
   }
@@ -47,6 +50,16 @@ public final class Animators {
     @Override
     public Animator playTogether(Collection<Animator> animators) {
       return AnimatorsBase.playTogether(animators);
+    }
+
+    @Override
+    public Animator playSequentially(Animator... animators) {
+      return AnimatorsBase.playSequentially(animators);
+    }
+
+    @Override
+    public Animator playSequentially(List<Animator> animators) {
+      return AnimatorsBase.playSequentially(animators);
     }
 
     @Override
@@ -95,6 +108,28 @@ public final class Animators {
   @Nullable
   public static Animator playTogether(Collection<Animator> animators) {
     return IMPL.playTogether(animators);
+  }
+
+  /**
+   * Creates an Animator to play each of the supplied animations when the previous animation ends.
+   * Returns {@code null} if there is no valid animator.
+   * Returns the first valid animator if there is only one valid animator.
+   * Returns an AnimatorSet if there are more the one animators.
+   */
+  @Nullable
+  public static Animator playSequentially(Animator... animators) {
+    return IMPL.playSequentially(animators);
+  }
+
+  /**
+   * Creates an Animator to play each of the supplied animations when the previous animation ends.
+   * Returns {@code null} if there is no valid animator.
+   * Returns the first valid animator if there is only one valid animator.
+   * Returns an AnimatorSet if there are more the one animators.
+   */
+  @Nullable
+  public static Animator playSequentially(List<Animator> animators) {
+    return IMPL.playSequentially(animators);
   }
 
   /**
