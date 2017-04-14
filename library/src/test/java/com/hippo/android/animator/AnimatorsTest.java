@@ -26,6 +26,8 @@ import static org.junit.Assert.assertNull;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import java.util.Arrays;
+import java.util.Collection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -36,7 +38,7 @@ import org.robolectric.annotation.Config;
 public class AnimatorsTest {
 
   @Test
-  public void testPlayTogether() {
+  public void testPlayTogetherArray() {
     assertNull(Animators.playTogether());
     assertNull(Animators.playTogether((Animator[]) null));
     assertNull(Animators.playTogether(null, null, null));
@@ -50,5 +52,21 @@ public class AnimatorsTest {
         ValueAnimator.ofInt(0, 0),
         null
     ));
+  }
+
+  @Test
+  public void testPlayTogetherCollection() {
+    assertNull(Animators.playTogether((Collection<Animator>) null));
+    assertNull(Animators.playTogether(Arrays.asList(new Animator[]{null, null, null})));
+
+    Animator animator = new ValueAnimator();
+    assertEquals(animator, Animators.playTogether(Arrays.asList(new Animator[]{null, animator, null})));
+
+    assertNotNull(Animators.playTogether(Arrays.asList(new Animator[]{
+        null,
+        ValueAnimator.ofInt(0, 0),
+        ValueAnimator.ofInt(0, 0),
+        null
+    })));
   }
 }

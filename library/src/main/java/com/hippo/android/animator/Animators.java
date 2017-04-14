@@ -25,12 +25,14 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.view.View;
+import java.util.Collection;
 
 public final class Animators {
   private Animators() {}
 
   private interface AnimatorsImpl {
     Animator playTogether(Animator... animators);
+    Animator playTogether(Collection<Animator> animators);
     Animator circularReveal(
         View view, int centerX, int centerY, float startRadius, float endRadius);
   }
@@ -39,6 +41,11 @@ public final class Animators {
 
     @Override
     public Animator playTogether(Animator... animators) {
+      return AnimatorsBase.playTogether(animators);
+    }
+
+    @Override
+    public Animator playTogether(Collection<Animator> animators) {
       return AnimatorsBase.playTogether(animators);
     }
 
@@ -76,6 +83,17 @@ public final class Animators {
    */
   @Nullable
   public static Animator playTogether(Animator... animators) {
+    return IMPL.playTogether(animators);
+  }
+
+  /**
+   * Creates an Animator to play all of the supplied animations at the same time.
+   * Returns {@code null} if there is no valid animator.
+   * Returns the first valid animator if there is only one valid animator.
+   * Returns an AnimatorSet if there are more the one animators.
+   */
+  @Nullable
+  public static Animator playTogether(Collection<Animator> animators) {
     return IMPL.playTogether(animators);
   }
 

@@ -27,12 +27,22 @@ import android.animation.ObjectAnimator;
 import android.view.View;
 import com.hippo.android.animator.reveal.Revealable;
 import com.hippo.android.animator.util.FloatProperty;
+import java.util.Arrays;
+import java.util.Collection;
 
 final class AnimatorsBase {
   private AnimatorsBase() {}
 
   static Animator playTogether(Animator... animators) {
     if (animators == null || animators.length == 0) {
+      return null;
+    } else {
+      return playTogether(Arrays.asList(animators));
+    }
+  }
+
+  static Animator playTogether(Collection<Animator> animators) {
+    if (animators == null || animators.size() == 0) {
       return null;
     }
 
