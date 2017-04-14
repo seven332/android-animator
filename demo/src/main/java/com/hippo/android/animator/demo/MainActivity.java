@@ -31,10 +31,14 @@ import android.widget.ListView;
 public class MainActivity extends AppCompatActivity {
 
   private static final String[] TITLES = {
+      "Play Together",
+      "Play Sequentially",
       "Circular Reveal",
   };
 
   private static final Class<?>[] CLASSES = {
+      PlayTogetherActivity.class,
+      PlaySequentiallyActivity.class,
       CircularRevealActivity.class,
   };
 

@@ -34,6 +34,10 @@
       </intent-filter>
     </activity>
 
+    <activity android:name=".PlayTogetherActivity"/>
+
+    <activity android:name=".PlaySequentiallyActivity"/>
+
     <activity android:name=".CircularRevealActivity"/>
 
   </application>
