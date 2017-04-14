@@ -37,6 +37,10 @@ public abstract class FloatProperty<T> extends Property<T, Float> {
     super(Float.class, null);
   }
 
+  public FloatProperty(String name) {
+    super(Float.class, name);
+  }
+
   /**
    * A type-specific variant of {@link #set(Object, Float)} that is faster when dealing
    * with fields of type <code>float</code>.
