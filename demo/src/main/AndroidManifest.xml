@@ -38,6 +38,8 @@
 
     <activity android:name=".PlaySequentiallyActivity"/>
 
+    <activity android:name=".OfPointFActivity"/>
+
     <activity android:name=".CircularRevealActivity"/>
 
   </application>
