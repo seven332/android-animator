@@ -24,6 +24,11 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.TypeEvaluator;
+import android.graphics.Path;
+import android.graphics.PathMeasure;
+import android.graphics.PointF;
+import android.util.Property;
 import android.view.View;
 import com.hippo.android.animator.reveal.Revealable;
 import com.hippo.android.animator.util.FloatProperty;
@@ -102,6 +107,70 @@ final class AnimatorsBase {
       }
     }
     return set == null ? previous : set;
+  }
+
+  private static class LinePointFEvaluator implements TypeEvaluator<PointF> {
+
+    private float startX;
+    private float startY;
+    private float endX;
+    private float endY;
+    private PointF point = new PointF();
+
+    public LinePointFEvaluator(float startX, float startY, float endX, float endY) {
+      this.startX = startX;
+      this.startY = startY;
+      this.endX = endX;
+      this.endY = endY;
+    }
+
+    @Override
+    public PointF evaluate(float fraction, PointF startValue, PointF endValue) {
+      point.x = startX + (fraction * (endX - startX));
+      point.y = startY + (fraction * (endY - startY));
+      return point;
+    }
+  }
+
+  private static class PathPointFEvaluator implements TypeEvaluator<PointF> {
+
+    private PathMeasure pathMeasure;
+    private float pathLength;
+    private float[] array = new float[2];
+    private PointF point = new PointF();
+
+    public PathPointFEvaluator(Path path) {
+      pathMeasure = new PathMeasure(path, false);
+      pathLength = pathMeasure.getLength();
+    }
+
+    @Override
+    public PointF evaluate(float fraction, PointF startValue, PointF endValue) {
+      // Ensure fraction in [0, 1]
+      if (fraction < 0) {
+        fraction = 0;
+      }
+      if (fraction > 1) {
+        fraction = 1;
+      }
+      pathMeasure.getPosTan(fraction * pathLength, array, null);
+      point.set(array[0], array[1]);
+      return point;
+    }
+  }
+
+  // Avoid weird behavior
+  private static final PointF DUMP_POINT_F = new PointF();
+
+  static <T> Animator ofPointF(
+      T target, Property<T, PointF> property, float startX, float startY, float endX, float endY) {
+    TypeEvaluator<PointF> evaluator = new LinePointFEvaluator(startX, startY, endX, endY);
+    return ObjectAnimator.ofObject(target, property, evaluator, DUMP_POINT_F, DUMP_POINT_F);
+  }
+
+  static <T> Animator ofPointF(T target, Property<T, PointF> property, Path path) {
+    TypeEvaluator<PointF> evaluator = new PathPointFEvaluator(path);
+    return ObjectAnimator.ofObject(target, property, evaluator, DUMP_POINT_F, DUMP_POINT_F);
   }
 
   private static class RevealProperty extends FloatProperty<Revealable> {

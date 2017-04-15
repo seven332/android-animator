@@ -21,14 +21,22 @@ package com.hippo.android.animator;
  */
 
 import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.graphics.Path;
+import android.graphics.PointF;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.util.Property;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 final class AnimatorsLollipop {
   private AnimatorsLollipop() {}
+
+  static <T> Animator ofPointF(T target, Property<T, PointF> property, Path path) {
+    return ObjectAnimator.ofObject(target, property, null, path);
+  }
 
   static Animator circularReveal(
       View view, int centerX, int centerY, float startRadius, float endRadius) {
