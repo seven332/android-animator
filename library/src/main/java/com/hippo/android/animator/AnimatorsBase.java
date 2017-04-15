@@ -39,6 +39,10 @@ import java.util.List;
 final class AnimatorsBase {
   private AnimatorsBase() {}
 
+  ///////////////////////////////////////////////////////////////////////////
+  // playTogether
+  ///////////////////////////////////////////////////////////////////////////
+
   static Animator playTogether(Animator... animators) {
     if (animators == null || animators.length == 0) {
       return null;
@@ -75,6 +79,10 @@ final class AnimatorsBase {
     return set == null ? first : set;
   }
 
+  ///////////////////////////////////////////////////////////////////////////
+  // playSequentially
+  ///////////////////////////////////////////////////////////////////////////
+
   static Animator playSequentially(Animator... animators) {
     if (animators == null || animators.length == 0) {
       return null;
@@ -108,6 +116,10 @@ final class AnimatorsBase {
     }
     return set == null ? previous : set;
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // ofPointF
+  ///////////////////////////////////////////////////////////////////////////
 
   private static class LinePointFEvaluator implements TypeEvaluator<PointF> {
 
@@ -172,6 +184,10 @@ final class AnimatorsBase {
     TypeEvaluator<PointF> evaluator = new PathPointFEvaluator(path);
     return ObjectAnimator.ofObject(target, property, evaluator, DUMP_POINT_F, DUMP_POINT_F);
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // circularReveal
+  ///////////////////////////////////////////////////////////////////////////
 
   private static class RevealProperty extends FloatProperty<Revealable> {
 
