@@ -184,6 +184,9 @@ public final class Animators {
   /**
    * Creates a circular reveal animator.
    * Returns {@code null} if can't create it or no need to create it.
+   * <p>
+   * Make sure the {@code view} implement {@link com.hippo.android.animator.reveal.Revealable}
+   * if {@code android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP}.
    */
   @Nullable
   public static Animator circularReveal(

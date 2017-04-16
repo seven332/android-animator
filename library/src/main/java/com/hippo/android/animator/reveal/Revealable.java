@@ -21,7 +21,14 @@ package com.hippo.android.animator.reveal;
  */
 
 import android.graphics.Canvas;
+import android.view.View;
 
+/**
+ * Implement this interface to make
+ * {@link com.hippo.android.animator.Animators#circularReveal(View, int, int, float, float)}
+ * work if {@code android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP}.
+ * Please check {@link RevealableView} to know how to implement it.
+ */
 public interface Revealable {
 
   /**
