@@ -27,14 +27,33 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.view.animation.FastOutLinearInInterpolator;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.util.Property;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Interpolator;
 import java.util.Collection;
 import java.util.List;
 
 public final class Animators {
   private Animators() {}
+
+  /**
+   * Just {@link LinearOutSlowInInterpolator}.
+   */
+  public static final Interpolator FAST_SLOW = new LinearOutSlowInInterpolator();
+
+  /**
+   * Just {@link FastOutLinearInInterpolator}.
+   */
+  public static final Interpolator SLOW_FAST = new FastOutLinearInInterpolator();
+
+  /**
+   * Just {@link FastOutSlowInInterpolator}.
+   */
+  public static final Interpolator SLOW_FAST_SLOW = new FastOutSlowInInterpolator();
 
   private interface AnimatorsImpl {
     Animator playTogether(Animator... animators);
