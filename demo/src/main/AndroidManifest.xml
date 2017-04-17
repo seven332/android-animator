@@ -42,5 +42,7 @@
 
     <activity android:name=".CircularRevealActivity"/>
 
+    <activity android:name=".CrossFadeActivity"/>
+
   </application>
 </manifest>

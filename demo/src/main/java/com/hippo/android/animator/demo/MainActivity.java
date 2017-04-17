@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
       "Play Sequentially",
       "ofPointF",
       "Circular Reveal",
+      "Cross Fade",
   };
 
   private static final Class<?>[] CLASSES = {
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
       PlaySequentiallyActivity.class,
       OfPointFActivity.class,
       CircularRevealActivity.class,
+      CrossFadeActivity.class,
   };
 
   @Override
