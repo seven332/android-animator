@@ -29,6 +29,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.Property;
 import android.view.View;
+import android.view.ViewGroup;
 import java.util.Collection;
 import java.util.List;
 
@@ -45,6 +46,7 @@ public final class Animators {
     <T> Animator ofPointF(T target, Property<T, PointF> property, Path path);
     Animator circularReveal(
         View view, int centerX, int centerY, float startRadius, float endRadius);
+    Animator crossFade(View from, View to, ViewGroup ancestor, boolean toIsTop);
   }
 
   private static class BaseAnimatorsImpl implements AnimatorsImpl {
@@ -84,6 +86,11 @@ public final class Animators {
     public Animator circularReveal(
         View view, int centerX, int centerY, float startRadius, float endRadius) {
       return AnimatorsBase.circularReveal(view, centerX, centerY, startRadius, endRadius);
+    }
+
+    @Override
+    public Animator crossFade(View from, View to, ViewGroup ancestor, boolean toIsTop) {
+      return AnimatorsBase.crossFade(from, to, ancestor, toIsTop);
     }
   }
 
@@ -192,5 +199,28 @@ public final class Animators {
   public static Animator circularReveal(
       View view, int centerX, int centerY, float startRadius, float endRadius) {
     return IMPL.circularReveal(view, centerX, centerY, startRadius, endRadius);
+  }
+
+  /**
+   * Creates a cross fade animator between from-view and to-view.
+   * Returns {@code null} if from-view or to-view isn't laid out, or
+   * {@code ancestor} is not the ancestor of any of from-view and to-view,
+   * or can't create overlay from {@code ancestor}, or something wrong happened.
+   * <p>
+   * The alpha values of from-view and to-view will be set to 0 when the animator starts.
+   * Instead screenshot of the views shows on the overlay.
+   * When the animator ends, the alpha values of from-view and to-view will come back.
+   * <p>
+   * From-view and to-view should not be too large.
+   *
+   * @param ancestor the common ancestor of both from-view and to-view,
+   *                 at the same time {@link com.hippo.android.animator.overlay.ViewOverlayCompat}
+   *                 must can be created from it.
+   * @param toIsTop {@code true} if the to-view is on the top of from-view.
+   */
+  @Nullable
+  public static Animator crossFade(
+      @Nullable View from, @Nullable View to, @Nullable ViewGroup ancestor, boolean toIsTop) {
+    return IMPL.crossFade(from, to, ancestor, toIsTop);
   }
 }

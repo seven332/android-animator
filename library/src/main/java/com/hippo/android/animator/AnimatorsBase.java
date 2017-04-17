@@ -25,19 +25,33 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
+import android.graphics.Bitmap;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.PointF;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.support.v4.view.ViewCompat;
+import android.util.Log;
 import android.util.Property;
 import android.view.View;
+import android.view.ViewGroup;
+import com.hippo.android.animator.overlay.ViewOverlayCompat;
 import com.hippo.android.animator.reveal.Revealable;
+import com.hippo.android.animator.util.ArcMotion;
 import com.hippo.android.animator.util.FloatProperty;
+import com.hippo.android.animator.util.IntProperty;
+import com.hippo.android.animator.util.PointFProperty;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 final class AnimatorsBase {
   private AnimatorsBase() {}
+
+  private static final String LOG_TAG = AnimatorsBase.class.getSimpleName();
 
   ///////////////////////////////////////////////////////////////////////////
   // playTogether
@@ -239,5 +253,177 @@ final class AnimatorsBase {
     } else {
       return null;
     }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // crossFade
+  ///////////////////////////////////////////////////////////////////////////
+
+  private static final int[] TEMP_LOCATION = new int[2];
+
+  private static final IntProperty<Drawable> DRAWABLE_ALPHA_PROPERTY;
+  private static final PointFProperty<Drawable> DRAWABLE_POSITION_PROPERTY;
+  private static final ArcMotion ACR_PATH_MOTION;
+
+  static {
+    DRAWABLE_ALPHA_PROPERTY = new IntProperty<Drawable>() {
+      @Override
+      public void setValue(Drawable object, int value) {
+        object.setAlpha(value);
+      }
+
+      @Override
+      public Integer get(Drawable object) {
+        return null;
+      }
+    };
+
+    DRAWABLE_POSITION_PROPERTY = new PointFProperty<Drawable>() {
+      private Rect bounds = new Rect();
+
+      @Override
+      public void set(Drawable object, PointF value) {
+        Rect bounds = this.bounds;
+        object.copyBounds(bounds);
+        int width = bounds.width();
+        int height = bounds.height();
+        int x = Math.round(value.x) - width / 2;
+        int y = Math.round(value.y) - height / 2;
+        bounds.offsetTo(x, y);
+        object.setBounds(bounds);
+      }
+
+      @Override
+      public PointF get(Drawable object) {
+        object.copyBounds(bounds);
+        return new PointF(bounds.left, bounds.top);
+      }
+    };
+
+    ACR_PATH_MOTION = new ArcMotion();
+    ACR_PATH_MOTION.setMaximumAngle(90);
+    ACR_PATH_MOTION.setMinimumHorizontalAngle(15);
+    ACR_PATH_MOTION.setMinimumVerticalAngle(0);
+  }
+
+  static Animator crossFade(final View from, final View to, ViewGroup ancestor, final boolean toIsTop) {
+    // Ensure views is laid out
+    if (!ViewCompat.isLaidOut(from) || !ViewCompat.isLaidOut(to)) {
+      Log.w(LOG_TAG, "From view and to view must be laid out before calling crossFade().");
+      return null;
+    }
+
+    // Get overlay
+    final ViewOverlayCompat overlay = ViewOverlayCompat.from(ancestor);
+    if (overlay == null) {
+      Log.w(LOG_TAG, "The ancestor in crossFade() must be able to create a ViewOverlay.");
+      return null;
+    }
+
+    // Get the location of from view
+    if (!Utils.getLocationInAncestor(from, ancestor, TEMP_LOCATION)) {
+      Log.w(LOG_TAG, "From view must be in ancestor in crossFade().");
+      return null;
+    }
+    int fromX = TEMP_LOCATION[0];
+    int fromY = TEMP_LOCATION[1];
+
+    // Get the location of to view
+    if (!Utils.getLocationInAncestor(to, ancestor, TEMP_LOCATION)) {
+      Log.w(LOG_TAG, "From view must be in ancestor in crossFade().");
+      return null;
+    }
+    int toX = TEMP_LOCATION[0];
+    int toY = TEMP_LOCATION[1];
+
+    // Get the screenshot of from view
+    final Bitmap fromBitmap = Utils.screenshot(from);
+    if (fromBitmap == null) {
+      Log.w(LOG_TAG, "Can't screenshot from view in crossFade().");
+      return null;
+    }
+
+    // Get the screenshot of to view
+    final Bitmap toBitmap = Utils.screenshot(to);
+    if (toBitmap == null) {
+      Log.w(LOG_TAG, "Can't screenshot to view in crossFade().");
+      fromBitmap.recycle();
+      return null;
+    }
+
+    // Create start drawables
+    final Drawable fromDrawable = new BitmapDrawable(from.getContext().getResources(), fromBitmap);
+    int fromWidth = fromBitmap.getWidth();
+    int fromHeight = fromBitmap.getHeight();
+    fromDrawable.setBounds(fromX, fromY, fromX + fromWidth, fromY + fromHeight);
+
+    int fromCenterX = fromX + fromWidth / 2;
+    int fromCenterY = fromY + fromHeight / 2;
+
+    // Create end drawable
+    final Drawable toDrawable = new BitmapDrawable(to.getContext().getResources(), toBitmap);
+    int toWidth = toBitmap.getWidth();
+    int toHeight = toBitmap.getHeight();
+    int toStartX = fromCenterX - toWidth / 2;
+    int toStartY = fromCenterY - toHeight / 2;
+    toDrawable.setBounds(toStartX, toStartY, toStartX + toWidth, toStartY + toHeight);
+
+    int toCenterX = toX + toWidth / 2;
+    int toCenterY = toY + toHeight / 2;
+
+    List<Animator> set = new ArrayList<>(4);
+
+    // Create alpha animators
+    Animator fromAlpha = ObjectAnimator.ofInt(fromDrawable, DRAWABLE_ALPHA_PROPERTY, 255, 0);
+    Animator toAlpha = ObjectAnimator.ofInt(toDrawable, DRAWABLE_ALPHA_PROPERTY, 0, 255);
+    set.add(fromAlpha);
+    set.add(toAlpha);
+
+    // Create position animators
+    if (fromCenterX != toCenterX || fromCenterY != toCenterY) {
+      Path path = ACR_PATH_MOTION.getPath(fromCenterX, fromCenterY, toCenterX, toCenterY);
+      Animator fromPosition = Animators.ofPointF(fromDrawable, DRAWABLE_POSITION_PROPERTY, path);
+      Animator toPosition = Animators.ofPointF(toDrawable, DRAWABLE_POSITION_PROPERTY, path);
+      set.add(fromPosition);
+      set.add(toPosition);
+    }
+
+    Animator animator = Animators.playTogether(set);
+    animator.addListener(new AnimatorListenerAdapter() {
+      float fromAlpha;
+      float toAlpha;
+
+      @Override
+      public void onAnimationStart(Animator animation) {
+        // Add drawables to overlay
+        if (toIsTop) {
+          overlay.add(fromDrawable);
+          overlay.add(toDrawable);
+        } else {
+          overlay.add(toDrawable);
+          overlay.add(fromDrawable);
+        }
+        // Hide from view and to view
+        fromAlpha = from.getAlpha();
+        toAlpha = to.getAlpha();
+        from.setAlpha(0.0f);
+        to.setAlpha(0.0f);
+      }
+
+      @Override
+      public void onAnimationEnd(Animator animation) {
+        // Remove drawables from overlay
+        overlay.remove(fromDrawable);
+        overlay.remove(toDrawable);
+        // Show from view and to view
+        from.setAlpha(fromAlpha);
+        to.setAlpha(toAlpha);
+        // Recycle bitmaps
+        fromBitmap.recycle();
+        toBitmap.recycle();
+      }
+    });
+
+    return animator;
   }
 }
