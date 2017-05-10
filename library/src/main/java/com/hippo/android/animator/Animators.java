@@ -216,7 +216,7 @@ public final class Animators {
    */
   @Nullable
   public static Animator circularReveal(
-      View view, int centerX, int centerY, float startRadius, float endRadius) {
+      @NonNull View view, int centerX, int centerY, float startRadius, float endRadius) {
     return IMPL.circularReveal(view, centerX, centerY, startRadius, endRadius);
   }
 
@@ -239,7 +239,7 @@ public final class Animators {
    */
   @Nullable
   public static Animator crossFade(
-      @Nullable View from, @Nullable View to, @Nullable ViewGroup ancestor, boolean toIsTop) {
+      @NonNull View from, @NonNull View to, @NonNull ViewGroup ancestor, boolean toIsTop) {
     return IMPL.crossFade(from, to, ancestor, toIsTop);
   }
 }
