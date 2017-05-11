@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
       "ofPointF",
       "Circular Reveal",
       "Cross Fade",
+      "Recolor Background",
   };
 
   private static final Class<?>[] CLASSES = {
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
       OfPointFActivity.class,
       CircularRevealActivity.class,
       CrossFadeActivity.class,
+      RecolorBackgroundActivity.class,
   };
 
   @Override

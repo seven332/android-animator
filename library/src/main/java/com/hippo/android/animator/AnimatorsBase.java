@@ -23,6 +23,7 @@ package com.hippo.android.animator;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.graphics.Bitmap;
@@ -31,6 +32,7 @@ import android.graphics.PathMeasure;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.ViewCompat;
 import android.util.Log;
@@ -425,5 +427,47 @@ final class AnimatorsBase {
     });
 
     return animator;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // Recolor background
+  ///////////////////////////////////////////////////////////////////////////
+
+  private static final IntProperty<ColorDrawable> COLOR_DRAWABLE_COLOR_PROPERTY;
+
+  static {
+    COLOR_DRAWABLE_COLOR_PROPERTY = new IntProperty<ColorDrawable>() {
+      @Override
+      public void setValue(ColorDrawable object, int value) {
+        object.setColor(value);
+      }
+
+      @Override
+      public Integer get(ColorDrawable object) {
+        return object.getColor();
+      }
+    };
+  }
+
+  static Animator recolorBackground(View view, int color) {
+    Drawable drawable = view.getBackground();
+    if (drawable instanceof ColorDrawable) {
+      return recolorBackground(view, ((ColorDrawable) drawable).getColor(), color);
+    } else {
+      return null;
+    }
+  }
+
+  static Animator recolorBackground(View view, int startColor, int endColor) {
+    if (startColor != endColor) {
+      Drawable drawable = view.getBackground();
+      if (drawable instanceof ColorDrawable) {
+        ObjectAnimator animator = ObjectAnimator.ofInt((ColorDrawable) drawable,
+            COLOR_DRAWABLE_COLOR_PROPERTY, startColor, endColor);
+        animator.setEvaluator(new ArgbEvaluator());
+        return animator;
+      }
+    }
+    return null;
   }
 }

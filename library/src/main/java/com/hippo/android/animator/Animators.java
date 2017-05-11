@@ -66,6 +66,8 @@ public final class Animators {
     Animator circularReveal(
         View view, int centerX, int centerY, float startRadius, float endRadius);
     Animator crossFade(View from, View to, ViewGroup ancestor, boolean toIsTop);
+    Animator recolorBackground(View view, int color);
+    Animator recolorBackground(View view, int startColor, int endColor);
   }
 
   private static class BaseAnimatorsImpl implements AnimatorsImpl {
@@ -110,6 +112,16 @@ public final class Animators {
     @Override
     public Animator crossFade(View from, View to, ViewGroup ancestor, boolean toIsTop) {
       return AnimatorsBase.crossFade(from, to, ancestor, toIsTop);
+    }
+
+    @Override
+    public Animator recolorBackground(View view, int color) {
+      return AnimatorsBase.recolorBackground(view, color);
+    }
+
+    @Override
+    public Animator recolorBackground(View view, int startColor, int endColor) {
+      return AnimatorsBase.recolorBackground(view, startColor, endColor);
     }
   }
 
@@ -241,5 +253,27 @@ public final class Animators {
   public static Animator crossFade(
       @NonNull View from, @NonNull View to, @NonNull ViewGroup ancestor, boolean toIsTop) {
     return IMPL.crossFade(from, to, ancestor, toIsTop);
+  }
+
+  /**
+   * Creates an Animator that animates color of the view's background to the specified color.
+   * The view's background should be a {@link android.graphics.drawable.ColorDrawable}.
+   * Returns {@code null} if the view's background is not a {@code ColorDrawable}, or
+   * no need to create a Animator.
+   */
+  @Nullable
+  public static Animator recolorBackground(@NonNull View view, int color) {
+    return IMPL.recolorBackground(view, color);
+  }
+
+  /**
+   * Creates an Animator that animates color of the view's background from {@code startColor}
+   * to {@code endColor}. The view's background should be a
+   * {@link android.graphics.drawable.ColorDrawable}. Returns {@code null} if
+   * the view's background is not a {@code ColorDrawable}, or no need to create a Animator.
+   */
+  @Nullable
+  public static Animator recolorBackground(@NonNull View view, int startColor, int endColor) {
+    return IMPL.recolorBackground(view, startColor, endColor);
   }
 }
