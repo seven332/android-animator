@@ -39,6 +39,7 @@ import android.util.Log;
 import android.util.Property;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import com.hippo.android.animator.overlay.ViewOverlayCompat;
 import com.hippo.android.animator.reveal.Revealable;
 import com.hippo.android.animator.util.ArcMotion;
@@ -467,6 +468,40 @@ final class AnimatorsBase {
         animator.setEvaluator(new ArgbEvaluator());
         return animator;
       }
+    }
+    return null;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // Recolor text
+  ///////////////////////////////////////////////////////////////////////////
+
+  public static final IntProperty<TextView> TEXT_VIEW_COLOR_PROPERTY;
+
+  static {
+    TEXT_VIEW_COLOR_PROPERTY = new IntProperty<TextView>() {
+      @Override
+      public void setValue(TextView object, int value) {
+        object.setTextColor(value);
+      }
+
+      @Override
+      public Integer get(TextView object) {
+        return object.getCurrentTextColor();
+      }
+    };
+  }
+
+  static Animator recolorText(TextView view, int color) {
+    return recolorText(view, view.getCurrentTextColor(), color);
+  }
+
+  static Animator recolorText(TextView view, int startColor, int endColor) {
+    if (startColor != endColor) {
+      ObjectAnimator animator = ObjectAnimator.ofInt(view, TEXT_VIEW_COLOR_PROPERTY,
+          startColor, endColor);
+      animator.setEvaluator(new ArgbEvaluator());
+      return animator;
     }
     return null;
   }

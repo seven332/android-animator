@@ -34,6 +34,7 @@ import android.util.Property;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
+import android.widget.TextView;
 import java.util.Collection;
 import java.util.List;
 
@@ -68,6 +69,8 @@ public final class Animators {
     Animator crossFade(View from, View to, ViewGroup ancestor, boolean toIsTop);
     Animator recolorBackground(View view, int color);
     Animator recolorBackground(View view, int startColor, int endColor);
+    Animator recolorText(TextView view, int color);
+    Animator recolorText(TextView view, int startColor, int endColor);
   }
 
   private static class BaseAnimatorsImpl implements AnimatorsImpl {
@@ -122,6 +125,16 @@ public final class Animators {
     @Override
     public Animator recolorBackground(View view, int startColor, int endColor) {
       return AnimatorsBase.recolorBackground(view, startColor, endColor);
+    }
+
+    @Override
+    public Animator recolorText(TextView view, int color) {
+      return AnimatorsBase.recolorText(view, color);
+    }
+
+    @Override
+    public Animator recolorText(TextView view, int startColor, int endColor) {
+      return AnimatorsBase.recolorText(view, startColor, endColor);
     }
   }
 
@@ -275,5 +288,23 @@ public final class Animators {
   @Nullable
   public static Animator recolorBackground(@NonNull View view, int startColor, int endColor) {
     return IMPL.recolorBackground(view, startColor, endColor);
+  }
+
+  /**
+   * Creates an Animator that animates color of the TextView to the specified color.
+   * Returns {@code null} if no need to create a Animator.
+   */
+  @Nullable
+  public static Animator recolorText(@NonNull TextView view, int color) {
+    return IMPL.recolorText(view, color);
+  }
+
+  /**
+   * Creates an Animator that animates color of the TextView from {@code startColor}
+   * to {@code endColor}. Returns {@code null} if no need to create a Animator.
+   */
+  @Nullable
+  public static Animator recolorText(@NonNull TextView view, int startColor, int endColor) {
+    return IMPL.recolorText(view, startColor, endColor);
   }
 }
